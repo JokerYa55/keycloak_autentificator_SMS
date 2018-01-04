@@ -16,6 +16,7 @@
  */
 package org.keycloak.examples.authenticator;
 
+import org.jboss.logging.Logger;
 import org.keycloak.credential.CredentialProvider;
 import org.keycloak.credential.CredentialProviderFactory;
 import org.keycloak.models.KeycloakSession;
@@ -25,13 +26,18 @@ import org.keycloak.models.KeycloakSession;
  * @version $Revision: 1 $
  */
 public class SecretQuestionCredentialProviderFactory implements CredentialProviderFactory<SecretQuestionCredentialProvider> {
-    @Override
-    public String getId() {
-        return "secret-question";
-    }
+
+    private final Logger log = Logger.getLogger(getClass().getName());
 
     @Override
+    public String getId() {
+        log.info("getId()");
+        return "secret-question";
+    }
+    
+    @Override
     public CredentialProvider create(KeycloakSession session) {
+        log.info("create => " + session);
         return new SecretQuestionCredentialProvider(session);
     }
 }

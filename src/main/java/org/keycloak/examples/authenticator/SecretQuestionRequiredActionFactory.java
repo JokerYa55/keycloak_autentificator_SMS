@@ -17,6 +17,7 @@
 
 package org.keycloak.examples.authenticator;
 
+import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.authentication.RequiredActionFactory;
 import org.keycloak.authentication.RequiredActionProvider;
@@ -30,36 +31,40 @@ import org.keycloak.models.KeycloakSessionFactory;
 public class SecretQuestionRequiredActionFactory implements RequiredActionFactory {
 
     private static final SecretQuestionRequiredAction SINGLETON = new SecretQuestionRequiredAction();
+    private final Logger log = Logger.getLogger(getClass().getName());
 
     @Override
     public RequiredActionProvider create(KeycloakSession session) {
+        log.info("create => " + session);
         return SINGLETON;
     }
 
 
     @Override
     public String getId() {
+        log.info("getId()");
         return SecretQuestionRequiredAction.PROVIDER_ID;
     }
 
     @Override
     public String getDisplayText() {
+        log.info("getDisplayText()");
         return "Secret Question";
     }
 
     @Override
     public void init(Config.Scope config) {
-
+        log.info("init => " + config);
     }
 
     @Override
     public void postInit(KeycloakSessionFactory factory) {
-
+        log.info("postInit => " + factory);
     }
 
     @Override
     public void close() {
-
+        log.info("close()");
     }
 
 }

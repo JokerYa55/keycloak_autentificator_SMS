@@ -28,6 +28,7 @@ import org.keycloak.provider.ProviderConfigProperty;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.jboss.logging.Logger;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -37,14 +38,17 @@ public class SecretQuestionAuthenticatorFactory implements AuthenticatorFactory,
 
     public static final String PROVIDER_ID = "secret-question-authenticator";
     private static final SecretQuestionAuthenticator SINGLETON = new SecretQuestionAuthenticator();
+    private final Logger log = Logger.getLogger(getClass().getName());
 
     @Override
     public String getId() {
+        log.info("getId");
         return PROVIDER_ID;
     }
 
     @Override
     public Authenticator create(KeycloakSession session) {
+        log.info("create => " + session);
         return SINGLETON;
     }
 
@@ -54,21 +58,25 @@ public class SecretQuestionAuthenticatorFactory implements AuthenticatorFactory,
     };
     @Override
     public AuthenticationExecutionModel.Requirement[] getRequirementChoices() {
+        log.info("getRequirementChoices()");
         return REQUIREMENT_CHOICES;
     }
 
     @Override
     public boolean isUserSetupAllowed() {
+        log.info("isUserSetupAllowed()");
         return true;
     }
 
     @Override
     public boolean isConfigurable() {
+        log.info("isConfigurable()");
         return true;
     }
 
     @Override
     public List<ProviderConfigProperty> getConfigProperties() {
+        log.info("getConfigProperties()");
         return configProperties;
     }
 
@@ -87,32 +95,35 @@ public class SecretQuestionAuthenticatorFactory implements AuthenticatorFactory,
 
     @Override
     public String getHelpText() {
+        log.info("getHelpText()");
         return "A secret question that a user has to answer. i.e. What is your mother's maiden name.";
     }
 
     @Override
     public String getDisplayType() {
+        log.info("getDisplayType()");
         return "Secret Question";
     }
 
     @Override
     public String getReferenceCategory() {
+        log.info("getReferenceCategory()");
         return "Secret Question";
     }
 
     @Override
     public void init(Config.Scope config) {
-
+        log.info("init => " + config);
     }
 
     @Override
     public void postInit(KeycloakSessionFactory factory) {
-
+        log.info("postInit => " + factory);
     }
 
     @Override
     public void close() {
-
+        log.info("close()");
     }
 
 

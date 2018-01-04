@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.keycloak.examples.authenticator;
 
 import org.keycloak.authentication.RequiredActionContext;
@@ -22,21 +21,25 @@ import org.keycloak.authentication.RequiredActionProvider;
 import org.keycloak.models.UserCredentialModel;
 
 import javax.ws.rs.core.Response;
+import org.jboss.logging.Logger;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
 public class SecretQuestionRequiredAction implements RequiredActionProvider {
+
     public static final String PROVIDER_ID = "secret_question_config";
+    private final Logger log = Logger.getLogger(getClass().getName());
 
     @Override
     public void evaluateTriggers(RequiredActionContext context) {
-
+        log.info("evaluateTriggers => " + context);
     }
 
     @Override
     public void requiredActionChallenge(RequiredActionContext context) {
+        log.info("requiredActionChallenge => " + context);
         Response challenge = context.form().createForm("secret-question-config.ftl");
         context.challenge(challenge);
 
@@ -44,6 +47,7 @@ public class SecretQuestionRequiredAction implements RequiredActionProvider {
 
     @Override
     public void processAction(RequiredActionContext context) {
+        log.info("processAction => " + context);
         String answer = (context.getHttpRequest().getDecodedFormParameters().getFirst("secret_answer"));
         UserCredentialModel input = new UserCredentialModel();
         input.setType(SecretQuestionCredentialProvider.SECRET_QUESTION);
@@ -54,6 +58,6 @@ public class SecretQuestionRequiredAction implements RequiredActionProvider {
 
     @Override
     public void close() {
-
+        log.info("close()");
     }
 }

@@ -34,6 +34,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import org.jboss.logging.Logger;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -42,8 +43,10 @@ import java.net.URI;
 public class SecretQuestionAuthenticator implements Authenticator {
 
     public static final String CREDENTIAL_TYPE = "secret_question";
+    private final Logger log = Logger.getLogger(getClass().getName());
 
     protected boolean hasCookie(AuthenticationFlowContext context) {
+        log.info("hasCookie => " + context);
         Cookie cookie = context.getHttpRequest().getHttpHeaders().getCookies().get("SECRET_QUESTION_ANSWERED");
         boolean result = cookie != null;
         if (result) {
@@ -54,6 +57,7 @@ public class SecretQuestionAuthenticator implements Authenticator {
 
     @Override
     public void authenticate(AuthenticationFlowContext context) {
+        log.info("authenticate => " + context);
         if (hasCookie(context)) {
             context.success();
             return;
@@ -64,6 +68,7 @@ public class SecretQuestionAuthenticator implements Authenticator {
 
     @Override
     public void action(AuthenticationFlowContext context) {
+        log.info("action => " + context);
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
         if (formData.containsKey("cancel")) {
             context.cancelLogin();
@@ -82,6 +87,7 @@ public class SecretQuestionAuthenticator implements Authenticator {
     }
 
     protected void setCookie(AuthenticationFlowContext context) {
+        log.info("setCookie => " + context);
         AuthenticatorConfigModel config = context.getAuthenticatorConfig();
         int maxCookieAge = 60 * 60 * 24 * 30; // 30 days
         if (config != null) {
@@ -96,7 +102,7 @@ public class SecretQuestionAuthenticator implements Authenticator {
                 false, true);
     }
 
-    public static void addCookie(String name, String value, String path, String domain, String comment, int maxAge, boolean secure, boolean httpOnly) {
+    public static void addCookie(String name, String value, String path, String domain, String comment, int maxAge, boolean secure, boolean httpOnly) {        
         HttpResponse response = ResteasyProviderFactory.getContextData(HttpResponse.class);
         StringBuffer cookieBuf = new StringBuffer();
         ServerCookie.appendCookieValue(cookieBuf, 1, name, value, path, domain, comment, maxAge, secure, httpOnly);
@@ -106,6 +112,7 @@ public class SecretQuestionAuthenticator implements Authenticator {
 
 
     protected boolean validateAnswer(AuthenticationFlowContext context) {
+        log.info("validateAnswer => " + context);
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
         String secret = formData.getFirst("secret_answer");
         UserCredentialModel input = new UserCredentialModel();
@@ -116,16 +123,19 @@ public class SecretQuestionAuthenticator implements Authenticator {
 
     @Override
     public boolean requiresUser() {
+        log.info("requiresUser");
         return true;
     }
 
     @Override
     public boolean configuredFor(KeycloakSession session, RealmModel realm, UserModel user) {
+        log.info("configuredFor => session = " + session + " realm => " + realm + " userModel => " + user);
         return session.userCredentialManager().isConfiguredFor(realm, user, SecretQuestionCredentialProvider.SECRET_QUESTION);
     }
 
     @Override
     public void setRequiredActions(KeycloakSession session, RealmModel realm, UserModel user) {
+        log.info("setRequiredActions => session = " + session + " realm => " + realm + " userModel => " + user);
         user.addRequiredAction(SecretQuestionRequiredAction.PROVIDER_ID);
     }
 
