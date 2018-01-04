@@ -40,6 +40,7 @@ import org.jboss.logging.Logger;
  * @version $Revision: 1 $
  */
 public class SecretQuestionCredentialProvider implements CredentialProvider, CredentialInputValidator, CredentialInputUpdater, OnUserCache {
+
     public static final String SECRET_QUESTION = "SECRET_QUESTION";
     public static final String CACHE_KEY = SecretQuestionCredentialProvider.class.getName() + "." + SECRET_QUESTION;
     private final Logger log = Logger.getLogger(getClass().getName());
@@ -52,25 +53,37 @@ public class SecretQuestionCredentialProvider implements CredentialProvider, Cre
     }
 
     public CredentialModel getSecret(RealmModel realm, UserModel user) {
-        log.info("getSecret => " + realm + " user => " + user);
+        log.info("getSecret => \nrealm => " + realm + "\nuser => " + user);
         CredentialModel secret = null;
         if (user instanceof CachedUserModel) {
-            CachedUserModel cached = (CachedUserModel)user;
-            secret = (CredentialModel)cached.getCachedWith().get(CACHE_KEY);
+            log.info("Cashed");
+            CachedUserModel cached = (CachedUserModel) user;
+            log.info("cached id => " + cached.getId() + " username => " + cached.getUsername());
+            try {
+                secret = (CredentialModel) cached.getCachedWith().get(CACHE_KEY);
+            } catch (Exception e) {
+                log.info("Error => " + e.getMessage());
+            }
 
         } else {
+            log.info("No Cashed");
             List<CredentialModel> creds = session.userCredentialManager().getStoredCredentialsByType(realm, user, SECRET_QUESTION);
-            if (!creds.isEmpty()) secret = creds.get(0);
+            if (!creds.isEmpty()) {
+                secret = creds.get(0);
+            }
         }
         return secret;
     }
 
-
     @Override
     public boolean updateCredential(RealmModel realm, UserModel user, CredentialInput input) {
         log.info("updateCredential => " + realm + " user => " + user + " input=> " + input);
-        if (!SECRET_QUESTION.equals(input.getType())) return false;
-        if (!(input instanceof UserCredentialModel)) return false;
+        if (!SECRET_QUESTION.equals(input.getType())) {
+            return false;
+        }
+        if (!(input instanceof UserCredentialModel)) {
+            return false;
+        }
         UserCredentialModel credInput = (UserCredentialModel) input;
         List<CredentialModel> creds = session.userCredentialManager().getStoredCredentialsByType(realm, user, SECRET_QUESTION);
         if (creds.isEmpty()) {
@@ -78,7 +91,7 @@ public class SecretQuestionCredentialProvider implements CredentialProvider, Cre
             secret.setType(SECRET_QUESTION);
             secret.setValue(credInput.getValue());
             secret.setCreatedDate(Time.currentTimeMillis());
-            session.userCredentialManager().createCredential(realm ,user, secret);
+            session.userCredentialManager().createCredential(realm, user, secret);
         } else {
             creds.get(0).setValue(credInput.getValue());
             session.userCredentialManager().updateCredential(realm, user, creds.get(0));
@@ -90,7 +103,9 @@ public class SecretQuestionCredentialProvider implements CredentialProvider, Cre
     @Override
     public void disableCredentialType(RealmModel realm, UserModel user, String credentialType) {
         log.info("disableCredentialType => " + realm + " user=> " + user + " credentialType => " + credentialType);
-        if (!SECRET_QUESTION.equals(credentialType)) return;
+        if (!SECRET_QUESTION.equals(credentialType)) {
+            return;
+        }
         session.userCredentialManager().disableCredentialType(realm, user, credentialType);
         session.userCache().evict(realm, user);
 
@@ -118,25 +133,39 @@ public class SecretQuestionCredentialProvider implements CredentialProvider, Cre
     @Override
     public boolean isConfiguredFor(RealmModel realm, UserModel user, String credentialType) {
         log.info("isConfiguredFor => " + realm + " user => " + user + " credentialType => " + credentialType);
-        if (!SECRET_QUESTION.equals(credentialType)) return false;
+        if (!SECRET_QUESTION.equals(credentialType)) {
+            return false;
+        }
         return getSecret(realm, user) != null;
     }
 
     @Override
     public boolean isValid(RealmModel realm, UserModel user, CredentialInput input) {
-        log.info("isValid => " + realm + " user => " + user + " input => " + input );
-        if (!SECRET_QUESTION.equals(input.getType())) return false;
-        if (!(input instanceof UserCredentialModel)) return false;
+        log.info("isValid => " + realm + "\n\tuser => " + user + "\n\tinput => " + input);
+        log.info("\tSECRET_QUESTION => " + SECRET_QUESTION);
+        log.info("\tinput.getType() => " + input.getType());
+        if (!SECRET_QUESTION.equals(input.getType())) {
+            log.info(1);
+            return false;
+        }
+        if (!(input instanceof UserCredentialModel)) {
+            log.info(2);
+            return false;
+        }
 
         String secret = getSecret(realm, user).getValue();
+        
+        log.info("\tsecret => " + secret);
 
-        return secret != null && ((UserCredentialModel)input).getValue().equals(secret);
+        return secret != null && ((UserCredentialModel) input).getValue().equals(secret);
     }
 
     @Override
     public void onCache(RealmModel realm, CachedUserModel user, UserModel delegate) {
         log.info("onCache => " + realm + " user => " + realm + " user => " + user + " delegate => " + delegate);
         List<CredentialModel> creds = session.userCredentialManager().getStoredCredentialsByType(realm, user, SECRET_QUESTION);
-        if (!creds.isEmpty()) user.getCachedWith().put(CACHE_KEY, creds.get(0));
+        if (!creds.isEmpty()) {
+            user.getCachedWith().put(CACHE_KEY, creds.get(0));
+        }
     }
 }
