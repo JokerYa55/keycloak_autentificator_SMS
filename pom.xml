@@ -19,13 +19,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     
 
-    <name>Authenticator Example</name>
+    <name>Authenticator SMS</name>
     <description/>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>authenticator-required-action-example</artifactId>
+    <artifactId>authenticator-sms</artifactId>
     <groupId>org.keycloak</groupId>
-    <version>3.3.0.Final-SNAPSHOT</version>
+    <version>1</version>
     <packaging>jar</packaging>
 
     <dependencies>
