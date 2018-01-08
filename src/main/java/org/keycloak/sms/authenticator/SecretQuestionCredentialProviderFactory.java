@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.keycloak.examples.authenticator;
+package org.keycloak.sms.authenticator;
 
 import org.jboss.logging.Logger;
 import org.keycloak.credential.CredentialProvider;

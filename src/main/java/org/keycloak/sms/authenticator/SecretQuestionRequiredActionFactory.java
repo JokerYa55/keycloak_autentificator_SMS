@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.keycloak.examples.authenticator;
+package org.keycloak.sms.authenticator;
 
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
