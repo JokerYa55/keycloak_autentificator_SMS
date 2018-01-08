@@ -45,12 +45,14 @@ public class SecretQuestionRequiredAction implements RequiredActionProvider {
 
     }
 
+    // Установливает SECRET_QUESTION 
     @Override
     public void processAction(RequiredActionContext context) {
         log.info("processAction => " + context);
         String answer = (context.getHttpRequest().getDecodedFormParameters().getFirst("secret_answer"));
         UserCredentialModel input = new UserCredentialModel();
         input.setType(SecretQuestionCredentialProvider.SECRET_QUESTION);
+        answer = Math.round(Math.random()*1000000)+"";
         input.setValue(answer);
         context.getSession().userCredentialManager().updateCredential(context.getRealm(), context.getUser(), input);
         context.success();
