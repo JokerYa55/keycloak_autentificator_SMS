@@ -58,10 +58,10 @@ public class SecretQuestionAuthenticator implements Authenticator {
     @Override
     public void authenticate(AuthenticationFlowContext context) {
         log.info("authenticate => " + context);
-        if (hasCookie(context)) {
+        /*if (hasCookie(context)) {
             context.success();
             return;
-        }
+        }*/
         Response challenge = context.form().createForm("secret-question.ftl");
         context.challenge(challenge);
     }
