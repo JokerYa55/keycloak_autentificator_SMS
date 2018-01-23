@@ -154,7 +154,7 @@ public class SecretQuestionCredentialProvider implements CredentialProvider, Cre
         }
 
         String secret = getSecret(realm, user).getValue();
-        
+
         log.info("\tsecret => " + secret);
 
         return secret != null && ((UserCredentialModel) input).getValue().equals(secret);
@@ -163,9 +163,18 @@ public class SecretQuestionCredentialProvider implements CredentialProvider, Cre
     @Override
     public void onCache(RealmModel realm, CachedUserModel user, UserModel delegate) {
         log.info("onCache => " + realm + " user => " + realm + " user => " + user + " delegate => " + delegate);
-        List<CredentialModel> creds = session.userCredentialManager().getStoredCredentialsByType(realm, user, SECRET_QUESTION);
-        if (!creds.isEmpty()) {
-            user.getCachedWith().put(CACHE_KEY, creds.get(0));
+        try {            
+            List<CredentialModel> creds = session.userCredentialManager().getStoredCredentialsByType(realm, user, SECRET_QUESTION);
+            creds.forEach((t) -> {
+                log.info(String.format("t-> %s = %s", t.getType(), t.getValue()));
+            });
+            if (!creds.isEmpty()) {
+                user.getCachedWith().put(CACHE_KEY, creds.get(0));
+                // TODO: 23012018 поправить работу с cache
+                log.info("test");
+            }
+        } catch (Exception e) {
+            log.log(Logger.Level.FATAL, e);
         }
     }
 }
