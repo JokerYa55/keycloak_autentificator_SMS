@@ -77,7 +77,7 @@ public class SecretQuestionAuthenticator implements Authenticator {
         boolean validated = validateAnswer(context);
         if (!validated) {
             Response challenge =  context.form()
-                    .setError("badSecret")
+                    .setError("Неверный код")
                     .createForm("secret-question.ftl");
             context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
             return;

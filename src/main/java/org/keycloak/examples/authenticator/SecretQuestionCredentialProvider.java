@@ -60,7 +60,8 @@ public class SecretQuestionCredentialProvider implements CredentialProvider, Cre
             CachedUserModel cached = (CachedUserModel) user;
             log.info("cached id => " + cached.getId() + " username => " + cached.getUsername());
             try {
-                secret = (CredentialModel) cached.getCachedWith().get(CACHE_KEY);
+                //secret = (CredentialModel) cached.getCachedWith().get(CACHE_KEY);
+                secret = (CredentialModel) cached.getCachedWith().get(SECRET_QUESTION);
             } catch (Exception e) {
                 log.info("Error => " + e.getMessage());
             }
@@ -163,18 +164,12 @@ public class SecretQuestionCredentialProvider implements CredentialProvider, Cre
     @Override
     public void onCache(RealmModel realm, CachedUserModel user, UserModel delegate) {
         log.info("onCache => " + realm + " user => " + realm + " user => " + user + " delegate => " + delegate);
-        try {            
-            List<CredentialModel> creds = session.userCredentialManager().getStoredCredentialsByType(realm, user, SECRET_QUESTION);
-            creds.forEach((t) -> {
-                log.info(String.format("t-> %s = %s", t.getType(), t.getValue()));
-            });
-            if (!creds.isEmpty()) {
-                user.getCachedWith().put(CACHE_KEY, creds.get(0));
-                // TODO: 23012018 поправить работу с cache
-                log.info("test");
-            }
-        } catch (Exception e) {
-            log.log(Logger.Level.FATAL, e);
+        List<CredentialModel> creds = session.userCredentialManager().getStoredCredentialsByType(realm, user, SECRET_QUESTION);
+        if (!creds.isEmpty()) {
+            //user.getCachedWith().put(CACHE_KEY, creds.get(0));
+            user.getCachedWith().put(SECRET_QUESTION, creds.get(0));
+            // TODO: 23012018 поправить работу с cache
+            log.info("test");
         }
     }
 }
