@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.keycloak.sms.authenticator;
 
 import org.jboss.resteasy.spi.HttpResponse;
@@ -35,6 +34,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import org.jboss.logging.Logger;
+import org.keycloak.models.cache.CachedUserModel;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -76,8 +76,8 @@ public class SecretQuestionAuthenticator implements Authenticator {
         }
         boolean validated = validateAnswer(context);
         if (!validated) {
-            Response challenge =  context.form()
-                    .setError("badSecret")
+            Response challenge = context.form()
+                    .setError("Невнрный код")
                     .createForm("secret-question.ftl");
             context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
             return;
@@ -102,14 +102,13 @@ public class SecretQuestionAuthenticator implements Authenticator {
                 false, true);
     }
 
-    public static void addCookie(String name, String value, String path, String domain, String comment, int maxAge, boolean secure, boolean httpOnly) {        
+    public static void addCookie(String name, String value, String path, String domain, String comment, int maxAge, boolean secure, boolean httpOnly) {
         HttpResponse response = ResteasyProviderFactory.getContextData(HttpResponse.class);
         StringBuffer cookieBuf = new StringBuffer();
         ServerCookie.appendCookieValue(cookieBuf, 1, name, value, path, domain, comment, maxAge, secure, httpOnly);
         String cookie = cookieBuf.toString();
         response.getOutputHeaders().add(HttpHeaders.SET_COOKIE, cookie);
     }
-
 
     protected boolean validateAnswer(AuthenticationFlowContext context) {
         log.info("validateAnswer => " + context);
@@ -130,6 +129,11 @@ public class SecretQuestionAuthenticator implements Authenticator {
     @Override
     public boolean configuredFor(KeycloakSession session, RealmModel realm, UserModel user) {
         log.info("configuredFor => session = " + session + " realm => " + realm + " userModel => " + user);
+        if (user instanceof CachedUserModel) {
+            log.info("Cache");
+        } else {
+            log.info("No Cache");
+        }
         return session.userCredentialManager().isConfiguredFor(realm, user, SecretQuestionCredentialProvider.SECRET_QUESTION);
     }
 

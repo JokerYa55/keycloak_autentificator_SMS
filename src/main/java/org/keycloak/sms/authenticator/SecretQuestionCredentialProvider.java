@@ -162,10 +162,12 @@ public class SecretQuestionCredentialProvider implements CredentialProvider, Cre
 
     @Override
     public void onCache(RealmModel realm, CachedUserModel user, UserModel delegate) {
-        log.info("onCache => " + realm + " user => " + realm + " user => " + user + " delegate => " + delegate);
+        log.info("\n\tonCache => " + realm + " user => " + realm + " user => " + user + " delegate => " + delegate);
         List<CredentialModel> creds = session.userCredentialManager().getStoredCredentialsByType(realm, user, SECRET_QUESTION);
         if (!creds.isEmpty()) {
+            log.info("cred => " + creds.get(0));
             user.getCachedWith().put(CACHE_KEY, creds.get(0));
+            log.info("GOOD");
         }
     }
 }
