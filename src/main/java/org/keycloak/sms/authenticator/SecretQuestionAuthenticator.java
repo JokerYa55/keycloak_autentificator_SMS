@@ -71,7 +71,12 @@ public class SecretQuestionAuthenticator implements Authenticator {
         log.info("action => " + context);
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
         if (formData.containsKey("cancel")) {
-            context.cancelLogin();
+            //context.cancelLogin();
+            log.info("cancel");
+            Response challenge = context.form()
+                    .setError("Невнрный код 1")
+                    .createForm("secret-question.ftl");
+            context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
             return;
         }
         boolean validated = validateAnswer(context);
